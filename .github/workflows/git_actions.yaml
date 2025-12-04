@@ -1,0 +1,52 @@
+name: CI + Docs (Doxygen + pdoc)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # ***************** DEPENDENCIAS ********************
+      # Checkout del repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # Configurar Python
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias Python, Pydoc y Doxygen
+        run: |
+          pip install pytest pydoc-markdown
+          sudo apt install -y doxygen graphviz
+
+      # ***************** GENERAR DOCUMENTACION ********************
+      # Ejecutar tests y actualizar README
+      - name: Ejecutar script de tests y actualizar README
+        run: python update_readme.py
+
+      #Generar documentación Doxygen
+      - name: Generar documentación Doxygen
+        run: doxygen docs/Doxyfile
+
+      #Generar documentación Markdown (pdoc)
+      - name: Generar documentación con pdoc
+        run: pydoc-markdown
+
+      # ***************** APLICAR CAMBIOS ********************
+      # Commit automático de todos los cambios
+      - name: Commit automático
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Actualización automática: README, Doxygen y Markdown Docs"
+          file_pattern: |
+            README.md
+            docs/**

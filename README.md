@@ -1,340 +1,270 @@
-# 1. Actividad: *GitHub Actions: entendiendo Workflow.*
-
-## 🎯 Objetivos de aprendizaje
-
-* Comprender la estructura de un workflow (`on`, `jobs`, `steps`).
-
-   * Ejecutar tests automáticamente en GitHub.
-   * Automatizar la actualización del `README.md` con el resultado.
- 
-* Explorar mejoras progresivas para descubrir el potencial de GitHub Actions.
-
----
-
-## 📝 Contexto
-
-Partimos de un **repositorio base** que contiene:
-
-* Un programa sencillo (`main.py`).
-* Un test unitario (`test_main.py`).
-* Un script (`update_readme.py`) que ejecuta los tests y modifica el `README.md`, con el resultado de ejecutar los test.
-* El workflow básico (`ci.yml`) que ejecuta el script y hace commit automático con `git-auto-commit-action`.
-
----
-
-## 🔹 Parte 1: Workflow básico. Ya implementado.
-
-1. El alumno clona el repositorio base.
-2. Comprende el contenido del script y del workflow.
-3. Ejecuta el workflow manualmente y comprueba que el `README.md` se actualiza con una de estas dos salidas:
-
-   * ✅ *Tests correctos*
-   * ❌ *Tests fallidos*
-
----
-
-## 🔹 Parte 2: Mejora obligatoria (nivel básico)
-
-Cada alumno debe implementar al menos una de estas mejoras:
-
-* **Historial de resultados en el README:** en lugar de sobrescribir, añadir nuevas líneas con fecha/hora.
-* **Generar un archivo `report.md`:** con más detalles de la ejecución (tests pasados, fallidos, tiempo).
-
----
-
-## 📑 Entregables
-
-Cada alumno debe entregar:
-
-1. Enlace a su repositorio con el workflow funcionando.
-2. Evidencia en el historial de commits de:
-
-   * Al menos un test correcto y uno fallido de la solución entregada.
-   * Una mejora implementada (historial, report.md, badge o equivalente).
-3. Breve documento (README_mejora.md) explicando:
-
-   * Qué mejoras ha implementado.
-   * Qué hace tu workflow.
-
----
-
-## 📌 Evaluación (rúbrica simplificada)
-
-* ✅ Workflow básico funciona y modifica el README.
-* ✅ Al menos una mejora implementada.
-* ✅ Explicación clara del funcionamiento y ventajas.
-
-
----
-
-# 2. SOLUCIÓN: "GitHub Actions + Python Script + Auto Commit"
-
-## 📝 Preparación del repositorio base
-
-Estructura:
-
-```
-mi-proyecto-actions/
- ├── main.py
- ├── test_main.py
- ├── update_readme.py   👈 nuevo script
- └── README.md
-```
-
-
-### README.md inicial   
-
-Una posible versión base del fichero README.md sería el siguiente (aunque finalmente será mas completo): 
-
-
-```markdown
 # Mi Proyecto con GitHub Actions
+## Estructura del proyecto
+#### ⚙️ Automatización e Integración
+- **`.github/workflows/git_actions.yaml`** → Define un **workflow de GitHub Actions** que ejecuta tareas automáticas (como tests o commits automáticos).
 
-Este proyecto sirve para aprender a usar GitHub Actions 🚀
+#### 🧩 Archivos principales
+- **`main.py`** → Código principal del proyecto.  
+- **`test_main.py`** → Contiene los **tests unitarios** para verificar el correcto funcionamiento del código.  
+- **`update_readme.py`** → Script que **ejecuta los tests** y **actualiza el `README.md`** con los resultados.
 
-## 3stado de los tests
-*Aún no ejecutados...*
+#### 📄 Documentación
+- **`pydoc-markdown.yml`** → Indica:
+  - Qué módulos documentar (`main`, `update_readme`, `test_main`).
+  - Dónde buscarlos (en el directorio actual).
+  - Cómo generar la documentación (`docs/markdown.md` en formato Markdown).
+- **`docs/html/`** → Contiene la documentación **HTML generada con Doxygen** a partir del **Doxyfile**.
+- **`docs/markdown.md`** → Documentación **Markdown generada automáticamente** con pydoc-markdown.
+
+#### 🧭 Clonar repositorio
 ```
+git clone https://github.com/Juanfu224/2526_DAW_u1_action
+```
+---
 
-### main.py   
+## 1º PARTE
+Historial de resultados en el README: en lugar de sobrescribir, añado nuevas líneas con fecha/hora.
+Cuando se hago un push en main el workflow ejecuta el script en Python. El script corre los tests y modifica el README.md añadiendo una de los siguientes resultados:
 
-Un ejemplo básico, que contiene una función saludo.  Puedes modificar la función cuando quieres que falle. 
+✅ Tests correctos
 
-```python
+❌ Tests fallidos
+
+## 2º PARTE
+### Descripción general
+En este caso, para la generacion de la documentacion en HTML he utilizado Doxyfile, ya que es compatible con bastantes lenguajes de programacion, por lo que puede seguir utilizandose caso de que se siga expandiendo el proyecto.
+
+Ahora, para el markdown he elegido ydoc-markdown ya que no necesitas configuraciones complicadas como en Sphinx o Doxygen. Basta con un archivo de configuración (pydoc-markdown.yml) y un simple comando.
+
+
+### 1. Estilo y herramientas de documentación
+- **Lenguaje:** Python  
+- **Estilo de documentación:** reStructuredText  
+- **Herramienta principal:** Doxygen, pydoc-markdown 
+- **Formatos generados:**
+  - 🌐 **HTML** → [Enlace a `docs/html/index.html`](./docs/html/index.html)
+  - 📄 **Markdown** → [Enlace a `docs/markdown.md`](./docs/markdown.md)
+
+
+### 2. Ejemplo de código documentado usando el estilo reStructuredText
+Archivo: [`main.py`](./main.py)
+```
 def saludo(nombre: str) -> str:
+    """
+    Genera un saludo personalizado.
+
+    :param str nombre: El nombre de la persona a saludar.
+    :returns: Un saludo en forma de cadena que incluye el nombre proporcionado.
+    :rtype: str
+    """
     return f"Hola, {nombre}!"
 ```
 
-### test\_main.py    
-
-Un test básico. 
-
-```python
-from main import saludo
-
-def test_saludo():
-    assert saludo("Mundo") == "Hola, Mundo!"
+### 3. Generación de documentación local
+#### 3.1 Dependencias
+Para empezar a generar la documentacion en local, tenemos que instalar todo lo necesario para no tener ningun problema de dependencias de Python, Pydoc y Doxygen.
+```
+pip install pytest pydoc-markdown
+sudo apt install -y doxygen graphviz
 ```
 
----
+#### 3.2 Generar configuracion
+Ahora tenemos que crear los archivos de configuracion para Doxygen y Pydoc.
 
-## 🐍 Script en Python (`update_readme.py`)
-
-Script en python. Este script ejecuta los tests y actualiza el README:
-
-```python
-import subprocess
-
-def run_tests():
-    try:
-        subprocess.check_call(["pytest", "-q"])
-        return "✅ Tests correctos"
-    except subprocess.CalledProcessError:
-        return "❌ Tests fallidos"
-
-def update_readme(status: str):
-    with open("README.md", "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    new_lines = []
-    for line in lines:
-        new_lines.append(line)
-        if line.strip() == "## Estado de los tests":
-            new_lines.append(status + "\n")
-            break
-
-    with open("README.md", "w", encoding="utf-8") as f:
-        f.writelines(new_lines)
-
-if __name__ == "__main__":
-    status = run_tests()
-    update_readme(status)
+Para doxygen tenemos que ejecutar el siguiente comando en ./docs para generar alli el archivo Doxyfile y tener en esa carpeta toda la documentacio:
+```
+doxygen -g
+```
+Para Pydoc hay que crear un archivo llamado `pydoc-markdown.yml` en la raiz de nuestro documeto.
+```
+touch pydoc-markdown.yml
 ```
 
-👉 Lo que hace:
+#### 3.3 Editar configuracion
+Ahora el archivo `docs/Doxyfile` lo tenemos que editar para tener una comfiguracion minima y funcional que nos sirva
+| Campo              | Descripción                                | Ejemplo           |
+| ------------------ | ------------------------------------------ | ----------------- |
+| `PROJECT_NAME`     | Nombre de tu proyecto                      | `"DAW_U1_ACTION"` |
+| `OUTPUT_DIRECTORY` | Carpeta donde se guardará la documentación | `./docs`          |
+| `INPUT`            | Rutas de los archivos del código fuente    | `.`               |
+| `RECURSIVE`        | Indica si buscar en subcarpetas            | `YES`             |
+| `GENERATE_HTML`    | Generar documentación en HTML              | `YES`             |
+| `GENERATE_LATEX`   | Generar documentación en PDF (opcional)    | `NO`              |
 
-1. Ejecuta los tests con `pytest`.
-2. Según el resultado, genera un estado ✅ o ❌.
-3. Modifica el `README.md` justo debajo de la sección `## 3stado de los tests`.
+En Pydoc hay que incluir las siguientes lineas en el archivo `pydoc-markdown.yml`:
+```
+loaders:
+  - type: python   # Tipo de loader: carga módulos de Python
+    search_path: ["."]  # Ruta donde buscar los módulos (aquí, la carpeta raíz)
+    modules:
+      - main          # Documenta el módulo main.py
+      - update_readme # Documenta el módulo update_readme.py
+      - test_main     # Documenta el módulo test_main.py
 
----
+renderer:
+  type: markdown        # Tipo de renderer: genera documentación en Markdown
+  filename: docs/markdown.md  # Archivo de salida donde se guardará la documentación
+```
 
-## ⚙️ Workflow (`.github/workflows/ci.yml`)
+#### 3.4 Generar documentacion
+Para generar la documentacion de Doxygen y Pydoc a partir de los archivos de configuracion que hemos hecho, tenemos que ejecutar los siguientes comandos:
+```
+doxygen docs/Doxyfile
+pydoc-markdown
+```
+Esto generará una pagina web donde podremos ver el resultado en `./docs/html/index.html` y un markdown en `docs/markdown.md`
 
-El workflow que gúía el github action:   
-
-```yaml
-name: CI con AutoCommit
-
+### 4. Flujo de GitHub Actions (Workflow)
+Se dispara al hacer un push de los cambios hechos en el repositorio en el archivo `.github/workflows/git_actions.yaml`
+```
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
-
-permissions:
-  contents: write   # 👈 IMPORTANTE: permite que el bot pueda hacer commits/push
-
-jobs:
-  test-and-update:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Configurar Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Instalar dependencias
-        run: pip install pytest
-
-      - name: Ejecutar script de tests y actualizar README
-        run: python update_readme.py
-
-      - name: Commit automático del README
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Update README con estado de tests"
-          file_pattern: README.md
 ```
 
----
+| Paso | Acción                                       | Descripción                                                                                                                                                      |
+| ---- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1️⃣   | Checkout del repositorio                     | Descarga todo el código del repositorio en el runner de GitHub Actions para poder trabajar sobre él.                                                             |
+| 2️⃣   | Configuración de Python                      | Configura la versión de Python necesaria (`3.12`) para poder ejecutar scripts y generar documentación.                                                           |
+| 3️⃣   | Instalación de dependencias                  | Instala las dependencias de Python (`pytest`, `pydoc-markdown`) y herramientas del sistema (`doxygen`, `graphviz`) necesarias para los tests y la documentación. |
+| 4️⃣   | Ejecutar script de tests y actualizar README | Ejecuta `update_readme.py` que corre los tests y actualiza el README con resultados o información actualizada del proyecto.                                      |
+| 5️⃣   | Generar documentación Doxygen                | Ejecuta `doxygen` usando `docs/Doxyfile` para crear documentación técnica de tu código en formato HTML u otros formatos configurados en Doxyfile.                |
+| 6️⃣   | Generar documentación con pdoc               | Genera documentación en Markdown usando `pydoc-markdown`, ideal para archivos legibles directamente en GitHub.                                                   |
+| 7️⃣   | Commit automático                            | Guarda todos los cambios generados (`README.md` y `docs/**`) usando `git-auto-commit-action` con un mensaje estándar de actualización automática.                |
 
-## 🚦 Flujo de la actividad
 
-1. Cuando se haga un **push** en `main`.
-2. Se le da permiso de escritura para hacer commits/push al repositorio.
-3. El workflow ejecuta el script en Python.
-4. El script corre los tests y modifica el `README.md`.
-5. La acción `git-auto-commit-action` hace commit automático con los cambios.
-6. El alumno ve en el repo cómo el `README.md` se actualiza con:
-    
-    * ✅ Tests correctos
-    * ❌ Tests fallidos
+### 5. Evidencias y enlaces
+#### 5.1 Enlaces
+| Tipo                       | Descripción                      | Enlace                                                                     |
+| -------------------------- | -------------------------------- | -------------------------------------------------------------------------- |
+| 📂 Repositorio             | Enlace al proyecto completo      | [Repositorio GitHub](https://github.com/Juanfu224/2526_DAW_u1_action)                |
+| 🌐 Documentación HTML      | Generada automáticamente         | [docs/html/index.html](./docs/html/index.html)                             |
+| 📄 Documentación adicional | Markdown o PDF                   | [docs/markdown.md](./docs/markdown.md)                                     |
+| ⚙️ Workflow                | Archivo YAML de automatización   | [.github/workflows/git_actions.yaml](./.github/workflows/git_actions.yaml) |
+| 🧪 Código documentado      | Ejemplo de función con docstring | [main.py](./main.py)                                                       |
 
----
-
-# 3. POSIBLES MEJORAS AL EJEMPLO ANTERIOR
-
-La idea es que no solo no repitais el ejemplo, sino que **investigueis, mejoreis y veais el potencial real de GitHub Actions**. Para ello se piden funcionalidades **extra e imaginativas**. Aqui teneis varias propuestas, de más sencillas a más potentes, todas pensadas para que veais ventajas prácticas:
-
----
-
-## 💡 Mejoras propuestas para el Action
-
-### 1. **Historial en el README**
-
-* Que en lugar de sobrescribir el estado, **guarden un histórico** en el README:
-  
-  ```markdown
-  ## 3stado de los tests
-  - ✅ 2025-09-22 18:00 - Tests correctos
-  - ❌ 2025-09-22 17:45 - Tests fallidos
-  ```
-  
-* 👉 Aprenderás a  **manejar fechas** y a **modificar archivos de forma acumulativa**.
-
----
-
-### 2. **Generar un `report.md` con detalles**
-
-* Crear un archivo `test-report.md` con:
-    
-    * Número total de tests.
-    * Tests pasados y fallidos.
-    * Tiempo de ejecución.
-
-* 👉 Aprenderás a  **exportar resultados de procesos** y tener **documentación viva** del proyecto.
-
----
-
-### 3. **Badges automáticos en README**
-
-* Añadir un **badge** dinámico al README con el estado:
-    
-    * Verde = Tests correctos
-    * Rojo = Tests fallidos
-* Usando [shields.io](https://shields.io/) o generando un badge local en SVG.
-
-* 👉 Entenderás cómo **mejorar la comunicación del estado** de un proyecto.
-
----
-
-### 4. **Notificaciones externas**
-
-* Enviar el resultado a:
-    
-    * **Slack/Discord** (webhook sencillo).
-    * **Email** (con una acción de envío).
-
-* 👉 Descrubrirás que Actions también sirve para **integrar con herramientas externas**.
-
----
-
-### 5. **Ejecutar en múltiples entornos (matrix)**
-
-* Hacer que los tests se ejecuten en:
-    
-    * Varias versiones de Python (`3.8`, `3.9`, `3.10`).
-    * O en Linux y Windows.
-     
-* 👉 Verás la potencia del `strategy.matrix` y comprobarás compatibilidad multiplataforma.
-
----
-
-### 6. **Programar ejecución automática**
-
-* Añadir `schedule` para que se ejecute cada día a medianoche.
-* El README mostraría:
-  
-  ```
-  ✅ Última comprobación automática: 2025-09-22 00:00
-  ```
-
-* 👉 Aprenderás a **programar tareas recurrentes**.
-
----
-
-### 7. **Generar una página web de resultados**
-
-* Publicar los resultados en GitHub Pages (`gh-pages`) usando `peaceiris/actions-gh-pages`.
-* 👉 Visualizarás cómo GitHub Actions puede hacer **CI/CD real** (tests + despliegue).
-
----
-
-### 8. **Crear Issues automáticos si fallan los tests**
-
-* Si un test falla → abrir un **issue automático** en el repositorio:
-  
-  ```yaml
-  - uses: actions/github-script@v7
-    with:
-      script: |
-        github.issues.create({
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          title: "❌ Tests fallidos",
-          body: "Se han detectado errores en los tests. Revisa el último commit."
-        })
-  ```
-* 👉 Aprenderás a **automatizar la gestión de incidencias**.
-
----
-
-## 🎯 Aprendizaje con estas mejoras
-
-Con estas extensiones conseguireis:
-
-* Experimentar **cómo GitHub Actions conecta piezas del desarrollo real** (tests, docs, issues, notificaciones, despliegues).
-* Entender la **ventaja competitiva** de CI/CD: feedback inmediato, documentación viva y automatización.
-* Pasar de un ejemplo didáctico a un flujo de trabajo que se parece mucho al que usan empresas reales.
-
----
-
-# Mi Proyecto con GitHub Actions
-
-Este proyecto sirve para aprender a usar GitHub Actions 🚀
+#### 5.2 Clave ssh configurada
+![Evidencia ssh](img/evidencia_ssh.png)
 
 ## Estado de los tests
+✅ 2025-10-12 14:52 Tests correctos
+
+✅ 2025-10-12 14:47 Tests correctos
+
+✅ 2025-10-12 12:54 Tests correctos
+
+✅ 2025-10-12 12:13 Tests correctos
+
+✅ 2025-10-12 10:25 Tests correctos
+
+✅ 2025-10-12 01:02 Tests correctos
+
+✅ 2025-10-12 00:46 Tests correctos
+
+✅ 2025-10-12 00:31 Tests correctos
+
+✅ 2025-10-12 00:29 Tests correctos
+
+✅ 2025-10-12 00:25 Tests correctos
+
+✅ 2025-10-12 00:20 Tests correctos
+
+✅ 2025-10-12 00:13 Tests correctos
+
+✅ 2025-10-11 23:49 Tests correctos
+
+✅ 2025-10-11 23:45 Tests correctos
+
+✅ 2025-10-11 23:30 Tests correctos
+
+✅ 2025-10-11 23:26 Tests correctos
+
+✅ 2025-10-11 23:17 Tests correctos
+
+✅ 2025-10-11 21:55 Tests correctos
+
+✅ 2025-10-11 21:45 Tests correctos
+
+✅ 2025-10-11 19:13 Tests correctos
+
+✅ 2025-10-11 19:06 Tests correctos
+
+✅ 2025-10-09 22:26 Tests correctos
+
+✅ 2025-10-09 22:07 Tests correctos
+
+✅ 2025-10-09 22:02 Tests correctos
+
+✅ 2025-10-09 22:00 Tests correctos
+
+✅ 2025-10-09 21:56 Tests correctos
+
+✅ 2025-10-09 21:54 Tests correctos
+
+✅ 2025-10-09 21:49 Tests correctos
+
+✅ 2025-10-09 21:47 Tests correctos
+
+✅ 2025-10-09 21:41 Tests correctos
+
+✅ 2025-10-09 21:19 Tests correctos
+
+✅ 2025-10-09 20:46 Tests correctos
+
+✅ 2025-10-09 20:37 Tests correctos
+
+✅ 2025-10-09 20:27 Tests correctos
+
+✅ 2025-10-09 20:23 Tests correctos
+
+✅ 2025-10-09 20:18 Tests correctos
+
+✅ 2025-10-09 20:17 Tests correctos
+
+✅ 2025-10-09 20:15 Tests correctos
+
+✅ 2025-10-09 20:10 Tests correctos
+
+✅ 2025-10-09 20:06 Tests correctos
+
+✅ 2025-10-09 19:24 Tests correctos
+
+✅ 2025-10-09 19:12 Tests correctos
+
+✅ 2025-10-09 19:07 Tests correctos
+
+✅ 2025-10-09 19:01 Tests correctos
+
+✅ 2025-10-09 18:58 Tests correctos
+
+✅ 2025-10-09 18:50 Tests correctos
+
+✅ 2025-10-09 18:13 Tests correctos
+
+✅ 2025-10-09 18:09 Tests correctos
+
+✅ 2025-10-09 18:05 Tests correctos
+
+✅ 2025-10-09 17:53 Tests correctos
+
+✅ 2025-10-09 09:42 Tests correctos
+
+✅ 2025-10-09 09:37 Tests correctos
+
+✅ 2025-10-09 08:51 Tests correctos
+
+✅ 2025-10-09 08:45 Tests correctos
+
+✅ 2025-10-09 08:30 Tests correctos
+
+✅ 2025-09-30 22:55 Tests correctos
+
+❌ 2025-09-30 22:54 Tests fallidos
+
+❌ 2025-09-30 21:25 Tests fallidos
+
+✅ 2025-09-30 21:23 Tests correctos
+
+✅ 2025-09-30 18:38 Tests correctos
 ✅ Tests correctos
