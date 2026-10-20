@@ -28,7 +28,7 @@ jobs:
         run: python update_readme.py
 
       - name: my-artifact
-        uses: actions/upload_artifact@v7
+        uses: actions/upload-artifact@v7
         with:
           name: "Artefacto"
           path: README.md
