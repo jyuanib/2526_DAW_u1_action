@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload_artifact@v7
         with:
           name: "Artefacto"
-          path: readme
+          path: README.md
